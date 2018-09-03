@@ -1,4 +1,3 @@
-﻿# Krzysztof Kuziel www.krzykustudio.pl
 # Python 3.5
 # Caesar Cipher - Wariation about
 # File Encryption and Decription with given key
