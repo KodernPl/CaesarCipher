@@ -7,46 +7,77 @@ import os.path
 #cryptography alphabet
 alphabet = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4','5','6','7','8','9','0']
 
+def encrypt_line(line, key = 0):
+    alphabet_count = len(alphabet)
+    key_index = 0
+
+    #dividing key to chars
+    key_list = [int(i) for i in str(key)]
+
+    encrypted_line = ""
+    #divide line to chars and encrypt
+    for char in line:
+        #if char is not in alphabet than do encrypt
+        try:
+            char_index = alphabet.index(char)
+            moving_index = char_index + key_list[key_index]
+
+            if moving_index >= alphabet_count:
+                moving_index = abs(alphabet_count - moving_index)
+            encrypted_line += alphabet[moving_index]
+
+            if key_index >= len(key_list)-1:
+                key_index = 0
+            else:
+                key_index+=1
+        except:
+            encrypted_line += char
+    return encrypted_line
+
+def decrypt_line(line, key = 0):
+    alphabet_count = len(alphabet)
+    key_index = 0
+
+    #dividing key to chars
+    key_list = [int(i) for i in str(key)]
+
+    encrypted_line = ""
+    for char in line:
+        try:
+            char_index = alphabet.index(char)
+            moving_index = char_index - key_list[key_index]
+
+            if moving_index < 0:
+                moving_index = abs(alphabet_count - moving_index)
+            encrypted_line += alphabet[moving_index]
+
+            if key_index >= len(key_list)-1:
+                key_index = 0
+            else:
+                key_index+=1
+        except:
+            encrypted_line += char
+    return encrypted_line
+
 def encrypt(input_file, output_file, key=0):
     """
     Encrypt file with given key
     @param input_file
     @param output_file
-    @param key 
+    @param key
     """
-    #dividing key to chars
-    key_list = [int(i) for i in str(key)]
 
     try:
         file_source = open(input_file, 'r')
         file_destination = open(output_file, 'w')
         key_index = 0 #key start index
-        alphabet_count = len(alphabet)
 
         #dividing file to lines
         for line in file_source:
-            encrypted_line = ""
-            #divide line to chars and encrypt
-            for char in line:
-
-                #if char is not in alphabet than do encrypt
-                try:
-                    char_index = alphabet.index(char)
-                    moving_index = char_index + key_list[key_index]
-                    
-                    if moving_index >= alphabet_count:
-                        moving_index = abs(alphabet_count - moving_index)
-                    encrypted_line += alphabet[moving_index]
-
-                    if key_index >= len(key_list)-1:
-                        key_index = 0  
-                    else:
-                      key_index+=1         
-                except:
-                    encrypted_line += char
+            encrypted_line = encrypt_line(line, key)
             #write to file
             file_destination.writelines(encrypted_line)
-            
+
             #write to last_key.txt used ked
             file_key = open("last_key.txt" , "w")
             file_key.writelines(key)
@@ -62,38 +93,16 @@ def encrypt(input_file, output_file, key=0):
 def decrypt(input_file, output_file, key=0):
     """
     Decrypt file with given key
-    @param input_file 
-    @param output_file 
-    @param key 
+    @param input_file
+    @param output_file
+    @param key
     """
-    
-    #divide key to chars
-    key_list = [int(i) for i in str(key)]
-
     try:
         file_source = open(input_file, 'r')
         file_destination = open(output_file, 'w')
-        key_index = 0 
-        alphabet_count = len(alphabet)
 
         for line in file_source:
-            encrypted_line = ""
-            for char in line:
-                try:
-                    char_index = alphabet.index(char)
-                    moving_index = char_index - key_list[key_index]
-                    
-                    if moving_index < 0:
-                        moving_index = abs(alphabet_count - moving_index)
-                    encrypted_line += alphabet[moving_index]
-
-                    if key_index >= len(key_list)-1:
-                        key_index = 0  
-                    else:
-                      key_index+=1         
-                except:
-                    encrypted_line += char
-            
+            encrypted_line = decrypt_line(line, key)
             file_destination.writelines(encrypted_line)
 
     except:
@@ -102,7 +111,7 @@ def decrypt(input_file, output_file, key=0):
         #clean up
         file_destination.close()
         file_source.close()
-    
+
 def menu_encryption():
     print("- - - -")
     print("Encryption Menu:")
@@ -110,7 +119,7 @@ def menu_encryption():
 
     while True:
         input_file = input("Enter input file name: ")
-        
+
         # check if file exist
         if(os.path.isfile(input_file)):
             break
@@ -131,7 +140,7 @@ def menu_decryption():
     print("- - - -")
     print("Decryption Menu:")
     print("-------")
-    
+
     while True:
         input_file = input("Enter input file name: ")
 		# check if file exist
@@ -165,7 +174,9 @@ def menu_main():
         print("-------")
         print("q - Quit")
         print("- - - -")
+
         menu = input()
+
         if(menu == "s"):
             menu_encryption()
         elif(menu == "d"):
@@ -176,4 +187,6 @@ def menu_main():
             print("Wrong choice")
 
 #start
-menu_main()
+if __name__ == '__main__':
+    menu_main()
+
